@@ -1,0 +1,34 @@
+name: App Store readiness
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  release-build:
+    runs-on: macos-15
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Verify submission assets
+        run: |
+          test -f NexoraMobile/Assets.xcassets/AppIcon.appiconset/AppIcon-1024.png
+          test -f NexoraMobile/Resources/LaunchScreen.storyboard
+          test -f NexoraMobile/Resources/PrivacyInfo.xcprivacy
+          test "$(sips -g pixelWidth NexoraMobile/Assets.xcassets/AppIcon.appiconset/AppIcon-1024.png | awk '/pixelWidth/ {print $2}')" = "1024"
+          test "$(sips -g pixelHeight NexoraMobile/Assets.xcassets/AppIcon.appiconset/AppIcon-1024.png | awk '/pixelHeight/ {print $2}')" = "1024"
+          test "$(sips -g hasAlpha NexoraMobile/Assets.xcassets/AppIcon.appiconset/AppIcon-1024.png | awk '/hasAlpha/ {print $2}')" = "no"
+
+      - name: Build Release for iPhone Simulator
+        run: >
+          xcodebuild
+          -project NexoraMobile.xcodeproj
+          -scheme NexoraMobile
+          -configuration Release
+          -sdk iphonesimulator
+          -destination 'generic/platform=iOS Simulator'
+          CODE_SIGNING_ALLOWED=NO
+          clean build
