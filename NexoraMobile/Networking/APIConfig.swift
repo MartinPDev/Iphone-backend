@@ -1,0 +1,15 @@
+import Foundation
+
+enum APIConfig {
+    static var baseURL: URL {
+        guard
+            let value = Bundle.main.object(forInfoDictionaryKey: "API_BASE_URL") as? String,
+            let url = URL(string: value),
+            !value.contains("example.com")
+        else {
+            return URL(string: "http://127.0.0.1:8000")!
+        }
+        return url
+    }
+}
+

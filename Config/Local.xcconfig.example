@@ -1,0 +1,5 @@
+#include "Shared.xcconfig"
+
+# Use an HTTPS production URL for a physical device.
+API_BASE_URL = https:/$()/api.example.com
+
